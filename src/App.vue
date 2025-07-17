@@ -1,18 +1,22 @@
 <template>
   <div>
-    <Header />
+    <div class="show-page">
+      <!-- <component :is="layout"> -->
+      <router-view></router-view>
+      <!-- </component> -->
+      <!-- <RouterView /> -->
 
-    <main>
-      <router-view />
-    </main>
-
-    <Footer />
+    </div>
   </div>
 </template>
 
 <script setup>
-import Header from '@/components/layouts/Header.vue'
-import Footer from '@/components/layouts/Footer.vue'
-</script>
+import { computed } from 'vue'
+import { useRoute } from "vue-router";
+// import GuestLayout from "@/layouts/guest/GuestLayout.vue";
 
-<style scoped></style>
+
+// const route = useRoute();
+// const layout = computed(() => route.meta.layout || GuestLayout);
+
+</script>

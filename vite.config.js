@@ -5,7 +5,7 @@ import vueDevTools from "vite-plugin-vue-devtools";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/Vue-Practice/", //Github Pages 路徑用
+  // base: "/Vue-Practice/", //Github Pages 路徑用
   plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {

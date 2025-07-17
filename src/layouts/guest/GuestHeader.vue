@@ -21,6 +21,10 @@
                             :class="{ 'active': route.path === '/products' }">產品架</router-link></li>
                     <li class="nav-item"><router-link to="/contact" class="nav-link"
                             :class="{ 'active': route.path === '/contact' }">聯絡我們</router-link></li>
+                    <li class="nav-item" v-if="!auth.isLoggedIn"><router-link to="/login" class="nav-link"
+                            :class="{ 'active': route.path === '/login' }">會員登入</router-link></li>
+                    <li class="nav-item" v-else><a href="#" @click.prevent="logout" class="nav-link">登出</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -34,11 +38,30 @@
     </header>
 </template>
 <script setup>
-import { useRoute } from 'vue-router'
-import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import api from '@/utils/axios';
+import { ref, watch, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
+import swal from 'sweetalert2'
+
+
+const auth = useAuthStore()
+
+onMounted(async () => {
+
+    const res = await api.get('/api/user')
+    auth.setUser(res.data)
+
+})
 
 const route = useRoute()
+const router = useRouter()
 const path = ref('')
+const success = ref('');
+const error = ref('');
+
+
 
 watch(
     () => route.path,
@@ -47,15 +70,49 @@ watch(
         console.log(path.value)
     }
 )
+
+
+const logout = async () => {
+
+    try {
+
+        let res = await api.post('/api/logout'); // ⭐ CSRF 初始化
+        auth.logout();
+        success.value = res.data.message;
+        router.push('/');
+
+    } catch (err) {
+
+        error.value = '登出失敗';
+
+    }
+};
+
+watch(
+    success,
+    (successData) => {
+        if (successData) {
+            swal.fire({
+                icon: 'success',
+                title: success.value,
+            });
+            success.value = ''; // reset，避免多次彈出
+        }
+    }
+)
+
+watch(
+    error,
+    (errorData) => {
+        if (errorData) {
+            swal.fire({
+                icon: 'error',
+                title: error.value,
+            });
+            error.value = ''; // reset，避免多次彈出
+        }
+    }
+)
 </script>
 
-<style lang="scss" scoped>
-.container {
-    .logo {
-        // width: 220px;
-        // height: auto !important;
-        // aspect-ratio: 11 / 3;
-        // object-fit: cover;
-    }
-}
-</style>
+<style lang="scss" scoped></style>
