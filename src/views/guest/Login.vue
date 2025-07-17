@@ -28,7 +28,7 @@
 
 <script setup>
 import { watch, ref } from 'vue';
-import api from '@/utils/axios';
+import { getToken, fetchData, postData, } from '@/utils/axios';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth'
 
@@ -43,14 +43,14 @@ const router = useRouter();
 
 const login = async () => {
     try {
-        await api.get('/sanctum/csrf-cookie'); // ⭐ CSRF 初始化
-        const resLogin = await api.post('/api/login', { email: email.value, password: password.value });
-        success.value = resLogin.data.message;
+        await getToken(); // ⭐ CSRF 初始化
+        const resLogin = await postData('/login', { email: email.value, password: password.value });
+        success.value = resLogin.message;
 
-        // 登入成功後，取得用戶資訊
+        // // 登入成功後，取得用戶資訊
         const auth = useAuthStore()
-        const resUserData = await api.get('/api/user')
-        auth.setUser(resUserData.data)
+        const resUserData = await fetchData('/user')
+        auth.setUser(resUserData)
         router.push('/'); // 登入成功後導向後台
     } catch (err) {
         error.value = '登入失敗';

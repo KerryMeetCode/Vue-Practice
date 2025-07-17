@@ -39,7 +39,7 @@
 </template>
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import api from '@/utils/axios';
+import { fetchData, postData } from '@/utils/axios';
 import { ref, watch, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -49,8 +49,8 @@ import swal from 'sweetalert2'
 const auth = useAuthStore()
 
 onMounted(async () => {
-
-    const res = await api.get('/api/user')
+    if (!auth.isLoggedIn) return
+    const res = await fetchData('/user')
     auth.setUser(res.data)
 
 })
@@ -76,9 +76,9 @@ const logout = async () => {
 
     try {
 
-        let res = await api.post('/api/logout'); // ⭐ CSRF 初始化
+        let res = await postData('/logout'); // ⭐ CSRF 初始化
         auth.logout();
-        success.value = res.data.message;
+        success.value = res.message;
         router.push('/');
 
     } catch (err) {
